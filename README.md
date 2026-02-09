@@ -18,6 +18,8 @@ Medical research queries often contain ambiguity that could lead to unsafe or un
    - Identifies query intent
    - Generates targeted clarifying questions
 
+   
+
 2. **Stage 2: Evidence Specification** (planned)
    - Refines evidence requirements based on clarifications
    - Establishes quality criteria
