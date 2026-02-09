@@ -23,9 +23,10 @@ from src.schemas import (
     FinalResponseReady, FinalResponseUnderspecified, FinalResponseOutOfScope,
     PipelineSummary, ScopeResult, Classification, ResponseType
 )
-from src.constants import OUT_OF_SCOPE_SECURITY, OUT_OF_SCOPE_NON_ENGLISH, OUT_OF_SCOPE_NON_MEDICAL
-from src.telemetry import log_step
+from src.constants import OUT_OF_SCOPE_SECURITY, OUT_OF_SCOPE_NON_ENGLISH, OUT_OF_SCOPE_NON_MEDICAL, PROMPT_VERSION
+from src.telemetry import log_step, log_run, compute_input_hash
 from src.exceptions import MPOError
+import time
 
 
 def run_pipeline(
@@ -51,6 +52,10 @@ def run_pipeline(
     if question_id is None:
         question_id = str(uuid4())
     
+    # Start timing for telemetry
+    pipeline_start_time = time.time()
+    input_hash = compute_input_hash(user_input)
+    
     log_step("Pipeline Start", question_id=question_id, details={"input_length": len(user_input)})
     
     # ==========================================
@@ -64,6 +69,9 @@ def run_pipeline(
     
     # Check if OUT_OF_SCOPE
     if call1_response.scope_result == ScopeResult.OUT_OF_SCOPE:
+        # Calculate total latency
+        pipeline_latency_ms = int((time.time() - pipeline_start_time) * 1000)
+        
         log_step("Pipeline Complete", question_id=question_id, details={
             "path": "OUT_OF_SCOPE",
             "reason": call1_response.out_of_scope_reason.value if call1_response.out_of_scope_reason else "unknown"
@@ -72,14 +80,18 @@ def run_pipeline(
         # Determine redirect message based on out_of_scope_reason
         if call1_response.out_of_scope_reason.value == "SECURITY_VIOLATION":
             redirect_message = OUT_OF_SCOPE_SECURITY
+            routing_decision = "security_violation"
         elif call1_response.out_of_scope_reason.value == "NON_ENGLISH":
             redirect_message = OUT_OF_SCOPE_NON_ENGLISH
+            routing_decision = "non_english"
         elif call1_response.out_of_scope_reason.value == "NON_MEDICAL":
             redirect_message = OUT_OF_SCOPE_NON_MEDICAL
+            routing_decision = "non_medical"
         else:
             redirect_message = "This question cannot be processed."
+            routing_decision = "unknown"
         
-        return FinalResponseOutOfScope(
+        result = FinalResponseOutOfScope(
             question_id=question_id,
             response_type=ResponseType.OUT_OF_SCOPE,
             original_question=user_input,
@@ -94,6 +106,24 @@ def run_pipeline(
             ),
             timestamp=datetime.utcnow().isoformat() + "Z"
         )
+        
+        # Log complete run to telemetry
+        log_run({
+            "question_id": question_id,
+            "raw_input": user_input,
+            "input_hash": input_hash,
+            "classification_result": "OUT_OF_SCOPE",
+            "routing_decision": routing_decision,
+            "triggered_rules": [],
+            "prompt_version": PROMPT_VERSION,
+            "model_version": call1_response.model_used,
+            "token_count": call1_response.token_count,
+            "latency_ms": pipeline_latency_ms,
+            "timestamp": result.timestamp,
+            "outcome": "out_of_scope_redirect"
+        })
+        
+        return result
     
     # ==========================================
     # CALL 2: Classification
@@ -106,6 +136,10 @@ def run_pipeline(
     
     # Check if READY (no clarification needed)
     if call2_response.classification == Classification.READY:
+        # Calculate total latency
+        pipeline_latency_ms = int((time.time() - pipeline_start_time) * 1000)
+        total_tokens = call1_response.token_count + call2_response.token_count
+        
         log_step("Pipeline Complete", question_id=question_id, details={
             "path": "READY",
             "classification": "READY"
@@ -115,7 +149,7 @@ def run_pipeline(
         # Future versions could apply normalization/formatting here
         confirmed_prompt = user_input
         
-        return FinalResponseReady(
+        result = FinalResponseReady(
             question_id=question_id,
             response_type=ResponseType.CONFIRMATION,
             original_question=user_input,
@@ -129,6 +163,24 @@ def run_pipeline(
             ),
             timestamp=datetime.utcnow().isoformat() + "Z"
         )
+        
+        # Log complete run to telemetry
+        log_run({
+            "question_id": question_id,
+            "raw_input": user_input,
+            "input_hash": input_hash,
+            "classification_result": "READY",
+            "routing_decision": "confirmation",
+            "triggered_rules": [],
+            "prompt_version": PROMPT_VERSION,
+            "model_version": f"{call1_response.model_used}, {call2_response.model_used}",
+            "token_count": total_tokens,
+            "latency_ms": pipeline_latency_ms,
+            "timestamp": result.timestamp,
+            "outcome": "confirmed_prompt"
+        })
+        
+        return result
     
     # ==========================================
     # CALL 3: Clarification Generator
@@ -144,13 +196,17 @@ def run_pipeline(
         log_step("Pipeline Error", question_id=question_id, details={"stage": "Call 3", "error": str(e)})
         raise
     
+    # Calculate total latency and tokens
+    pipeline_latency_ms = int((time.time() - pipeline_start_time) * 1000)
+    total_tokens = call1_response.token_count + call2_response.token_count + call3_response.token_count
+    
     log_step("Pipeline Complete", question_id=question_id, details={
         "path": "UNDERSPECIFIED",
         "classification": "UNDERSPECIFIED",
         "options_generated": len(call3_response.clarification_options)
     })
     
-    return FinalResponseUnderspecified(
+    result = FinalResponseUnderspecified(
         question_id=question_id,
         response_type=ResponseType.CLARIFICATION,
         original_question=user_input,
@@ -166,6 +222,24 @@ def run_pipeline(
         ),
         timestamp=datetime.utcnow().isoformat() + "Z"
     )
+    
+    # Log complete run to telemetry
+    log_run({
+        "question_id": question_id,
+        "raw_input": user_input,
+        "input_hash": input_hash,
+        "classification_result": "UNDERSPECIFIED",
+        "routing_decision": "clarification",
+        "triggered_rules": call2_response.triggered_rules,
+        "prompt_version": PROMPT_VERSION,
+        "model_version": f"{call1_response.model_used}, {call2_response.model_used}, {call3_response.model_used}",
+        "token_count": total_tokens,
+        "latency_ms": pipeline_latency_ms,
+        "timestamp": result.timestamp,
+        "outcome": "clarification_options"
+    })
+    
+    return result
 
 
 if __name__ == "__main__":
