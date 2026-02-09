@@ -1,0 +1,16 @@
+# Medical Research Prompt Optimizer v1 - Dependencies
+
+# HTTP client for OpenRouter API
+httpx==0.28.1
+
+# Schema validation
+pydantic==2.12.5
+pydantic_core==2.41.5
+
+# Environment variable management
+python-dotenv==1.2.1
+
+# Web framework (for Phase 3+)
+fastapi==0.115.0
+uvicorn==0.32.0
+jinja2==3.1.4

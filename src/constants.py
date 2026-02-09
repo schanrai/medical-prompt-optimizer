@@ -1,0 +1,53 @@
+"""
+Constants for Medical Research Prompt Optimizer v1.
+
+Static copy strings, model configuration, and prompt version tracking.
+All environment and path config moved to src/config.py.
+"""
+
+# Prompt version (tracked in telemetry)
+PROMPT_VERSION = "v1.0"
+
+# Model configuration per call (from spec testing results, lines 88-99)
+CALL_1_MODEL = "anthropic/claude-sonnet-4-5"  # Scope + Security Gate
+CALL_1_PARAMS = {
+    "temperature": 0.0,  # Deterministic gate-keeping
+}
+
+CALL_2_MODEL = "anthropic/claude-opus-4-5"    # Classification
+CALL_2_PARAMS = {
+    "temperature": 0.3,  # Deterministic classification (medical safety)
+}
+
+CALL_3_MODEL = "anthropic/claude-sonnet-4-5"  # Clarification Generator
+CALL_3_PARAMS = {
+    "temperature": 0.3,  # Deterministic clarification generation
+}
+
+# Static copy strings (from spec lines 1030-1037)
+EMERGENCY_WARNING = """⚠️ URGENT: If you're experiencing a medical emergency, call 911 immediately.
+For poison emergencies, call Poison Control: 1-800-222-1222."""
+
+HEALTHCARE_REMINDER = "If you're experiencing symptoms, please consult a healthcare provider."
+
+FOOTER = "Select or revise, then use with your preferred research tool."
+
+# OUT_OF_SCOPE response templates (from spec lines 524-551)
+OUT_OF_SCOPE_SECURITY = """This tool is designed to help frame medical research questions.
+
+Your input appears to contain instructions that don't align with this purpose.
+Please submit a medical research question you'd like help framing."""
+
+OUT_OF_SCOPE_NON_ENGLISH = """This tool currently supports English-language questions only.
+
+Please resubmit your medical research question in English."""
+
+OUT_OF_SCOPE_NON_MEDICAL = """This tool is designed for medical research questions.
+
+Your question doesn't appear to be health-related. If it is, try rephrasing
+to make the health/medical topic clearer.
+
+Examples of medical research questions this tool can help with:
+- "What does the research say about [supplement/treatment] for [condition]?"
+- "How do [biomarker] levels vary across [populations]?"
+- "What are the known risks of [intervention] in [population]?"""
