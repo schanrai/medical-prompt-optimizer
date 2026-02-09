@@ -19,6 +19,7 @@ from src.constants import CALL_2_MODEL, CALL_2_PARAMS, PROMPT_VERSION
 from src.telemetry import log_step
 from src.config import PROMPTS_DIR
 from src.exceptions import LLMCallError, JSONParseError, ValidationError
+from src.json_schemas import CALL_2_SCHEMA
 
 # Load system prompt
 PROMPT_FILE = PROMPTS_DIR / "call_2_system.txt"
@@ -56,6 +57,7 @@ def run_call_2(user_input: str, question_id: Optional[str] = None) -> Call2Respo
         user_message="Please classify the question above.",
         model=CALL_2_MODEL,
         model_params=CALL_2_PARAMS,
+        response_schema=CALL_2_SCHEMA,
     )
     
     # Extract metadata

@@ -62,23 +62,18 @@ def call_llm(
     if model_params:
         payload.update(model_params)
     
-    # CRITICAL TODO: Test OpenRouter structured output support
-    # If response_schema provided, attempt to use response_format parameter
+    # Structured output support (tested 2026-02-09 - OpenRouter supports this!)
+    # If response_schema provided, use response_format parameter for reliable JSON
     # Spec lines 112-118 document this approach for reliable JSON output
-    # Current status: UNTESTED - using prompt engineering fallback
-    # Action: Test this BEFORE building Call 2 and Call 3
     if response_schema:
-        # Attempt structured output (OpenRouter may support this)
-        # payload["response_format"] = {
-        #     "type": "json_schema",
-        #     "json_schema": {
-        #         "name": "call_response",
-        #         "strict": True,
-        #         "schema": response_schema
-        #     }
-        # }
-        # For now: rely on prompt engineering for JSON structure
-        pass
+        payload["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "call_response",
+                "strict": True,
+                "schema": response_schema
+            }
+        }
     
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",

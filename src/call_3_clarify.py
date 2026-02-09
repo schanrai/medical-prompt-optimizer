@@ -18,6 +18,7 @@ from src.constants import CALL_3_MODEL, CALL_3_PARAMS, PROMPT_VERSION
 from src.telemetry import log_step
 from src.config import PROMPTS_DIR
 from src.exceptions import LLMCallError, JSONParseError, ValidationError
+from src.json_schemas import CALL_3_SCHEMA
 
 # Load system prompt
 PROMPT_FILE = PROMPTS_DIR / "call_3_system.txt"
@@ -70,6 +71,7 @@ def run_call_3(
         user_message="Please generate clarification options for the question above.",
         model=CALL_3_MODEL,
         model_params=CALL_3_PARAMS,
+        response_schema=CALL_3_SCHEMA,
     )
     
     # Extract metadata

@@ -19,6 +19,7 @@ from src.constants import CALL_1_MODEL, CALL_1_PARAMS, PROMPT_VERSION
 from src.telemetry import log_step
 from src.config import PROMPTS_DIR
 from src.exceptions import LLMCallError, JSONParseError, ValidationError
+from src.json_schemas import CALL_1_SCHEMA
 
 # Load system prompt
 PROMPT_FILE = PROMPTS_DIR / "call_1_system.txt"
@@ -58,6 +59,7 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
         user_message=user_input,
         model=CALL_1_MODEL,
         model_params=CALL_1_PARAMS,
+        response_schema=CALL_1_SCHEMA,
     )
     
     # Extract metadata
