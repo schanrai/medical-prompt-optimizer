@@ -237,7 +237,7 @@ function createMainContent(content, subtype) {
         // CLARIFICATION response type
         div.className = 'bg-white border border-gray-200 rounded-lg p-6 mb-4';
         div.innerHTML = `
-            <h2 class="text-xl font-semibold text-gray-900 mb-3">Your question needs clarification</h2>
+            <h2 class="text-3xl font-bold text-amber-700 mb-3">Your question needs clarification</h2>
             <p class="text-gray-700 mb-4">${escapeHtml(content.reasoning)}</p>
             <div class="space-y-2">
                 <p class="text-sm font-medium text-gray-700 mb-2">Suggested rewrites (click to use):</p>
@@ -320,22 +320,27 @@ function createHealthcareReminder(content) {
 
 /**
  * Create closing message block (result footer - NOT page footer)
- * Styling varies based on content (success state gets prominent styling)
+ * Styling varies based on message type (both get prominent styling, different colors)
  */
 function createClosingMessage(content) {
     const div = document.createElement('div');
     
-    // Check if this is the success/confirmation message
+    // Check message type and apply appropriate styling
     const isSuccessMessage = content.includes('can be used safely');
+    const isClarificationMessage = content.includes('Pick or revise');
     
     if (isSuccessMessage) {
-        // Prominent styling for success state
+        // Prominent green styling for confirmation/success state
         div.className = 'bg-green-100 border-l-4 border-green-600 p-4 rounded-r-lg mb-4';
         div.innerHTML = `<p class="text-base font-semibold text-green-800">${escapeHtml(content)}</p>`;
+    } else if (isClarificationMessage) {
+        // Prominent amber styling for clarification state (actionable, not error)
+        div.className = 'bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg mb-4';
+        div.innerHTML = `<p class="text-base font-semibold text-amber-800">${escapeHtml(content)}</p>`;
     } else {
-        // Standard styling for other messages (clarification)
-        div.className = 'text-sm text-gray-600 italic mb-4';
-        div.innerHTML = `<p>${escapeHtml(content)}</p>`;
+        // Fallback styling (should rarely be used)
+        div.className = 'bg-gray-100 border-l-4 border-gray-400 p-4 rounded-r-lg mb-4';
+        div.innerHTML = `<p class="text-base font-semibold text-gray-700">${escapeHtml(content)}</p>`;
     }
     
     return div;
