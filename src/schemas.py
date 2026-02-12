@@ -71,6 +71,7 @@ class Call1Response(BaseModel):
     is_medical: bool
     security_violation: bool
     security_type: SecurityType
+    emergency_language_detected: bool
     reasoning: str
     scope_result: ScopeResult
     out_of_scope_reason: Optional[OutOfScopeReason] = None
@@ -125,6 +126,7 @@ class FinalResponseReady(BaseModel):
     original_question: str
     confirmed_prompt: str
     include_healthcare_reminder: bool
+    emergency_language_detected: bool = False
     pipeline_summary: PipelineSummary
     timestamp: str
 
@@ -137,6 +139,7 @@ class FinalResponseUnderspecified(BaseModel):
     reasoning: str
     clarification_options: List[ClarificationOption]
     include_healthcare_reminder: bool
+    emergency_language_detected: bool = False
     pipeline_summary: PipelineSummary
     timestamp: str
 
@@ -148,6 +151,7 @@ class FinalResponseOutOfScope(BaseModel):
     out_of_scope_reason: OutOfScopeReason
     security_type: SecurityType
     redirect_message: str
+    emergency_language_detected: bool = False
     pipeline_summary: PipelineSummary
     timestamp: str
 

@@ -68,10 +68,11 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
     token_count = metadata.get('token_count', 0)
     latency_ms = metadata.get('latency_ms', 0)
     
-    # Determine scope_result and out_of_scope_reason
+    # Extract classification fields
     security_violation = response.get('security_violation', False)
     is_english = response.get('is_english', False)
     is_medical = response.get('is_medical', False)
+    emergency_language_detected = response.get('emergency_language_detected', False)
     
     if security_violation:
         scope_result = ScopeResult.OUT_OF_SCOPE
@@ -105,6 +106,7 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
             is_medical=is_medical,
             security_violation=security_violation,
             security_type=security_type,
+            emergency_language_detected=emergency_language_detected,
             reasoning=response.get('reasoning', ''),
             scope_result=scope_result,
             out_of_scope_reason=out_of_scope_reason,
@@ -122,6 +124,7 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
     log_step("Call 1", question_id=question_id, details={
         "scope_result": scope_result.value,
         "security_violation": security_violation,
+        "emergency_language_detected": emergency_language_detected,
         "tokens": token_count,
         "latency_ms": latency_ms
     })
@@ -166,6 +169,7 @@ if __name__ == "__main__":
             print(f"   Scope: {result.scope_result.value}")
             print(f"   Security violation: {result.security_violation}")
             print(f"   Security type: {result.security_type.value}")
+            print(f"   Emergency detected: {result.emergency_language_detected}")
             print(f"   Reasoning: {result.reasoning}")
             print(f"   Tokens: {result.token_count}, Latency: {result.latency_ms}ms")
         except MPOError as e:

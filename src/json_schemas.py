@@ -26,12 +26,16 @@ CALL_1_SCHEMA = {
             "enum": ["NONE", "INJECTION", "JAILBREAK", "EXTRACTION"],
             "description": "Type of security violation if detected"
         },
+        "emergency_language_detected": {
+            "type": "boolean",
+            "description": "Whether the user appears to be in an active medical crisis right now"
+        },
         "reasoning": {
             "type": "string",
             "description": "Brief explanation of the classification decision"
         }
     },
-    "required": ["is_english", "is_medical", "security_violation", "security_type", "reasoning"],
+    "required": ["is_english", "is_medical", "security_violation", "security_type", "emergency_language_detected", "reasoning"],
     "additionalProperties": False
 }
 
