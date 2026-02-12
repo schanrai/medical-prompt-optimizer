@@ -6,7 +6,7 @@
  * - Form submission to POST /api/check
  * - Dynamic rendering of display_blocks from API response
  * - Clickable clarification options that populate input field
- * - "Try Again" button to reset UI state
+ * - "Ask Another Question" button to reset UI state
  * - Error handling and validation feedback
  */
 
@@ -89,7 +89,7 @@ form.addEventListener('submit', async (event) => {
         return;
     }
     
-    // Show loading state
+    // Show loading state with spinner
     submitBtn.disabled = true;
     submitBtn.innerHTML = `
         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -168,9 +168,9 @@ function renderResult(data) {
         }
     });
     
-    // Add "Try Again" button at the end
-    const tryAgainBtn = createTryAgainButton();
-    resultArea.appendChild(tryAgainBtn);
+    // Add "Ask Another Question" button at the end
+    const askAnotherBtn = createAskAnotherButton();
+    resultArea.appendChild(askAnotherBtn);
     
     // Show result area
     resultArea.classList.remove('hidden');
@@ -192,13 +192,13 @@ function createDisplayBlock(block) {
             return createEmergencyWarning(content);
         
         case 'main_content':
-            return createMainContent(content);
+            return createMainContent(content, block.subtype);
         
         case 'healthcare_reminder':
             return createHealthcareReminder(content);
         
         case 'footer':
-            return createFooter(content);
+            return createClosingMessage(content);
         
         default:
             console.warn('Unknown block type:', type);
@@ -211,7 +211,7 @@ function createDisplayBlock(block) {
  */
 function createEmergencyWarning(content) {
     const div = document.createElement('div');
-    div.className = 'bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg';
+    div.className = 'bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-4';
     div.innerHTML = `
         <div class="flex items-start">
             <div class="flex-shrink-0">
@@ -230,24 +230,23 @@ function createEmergencyWarning(content) {
 /**
  * Create main content block (varies by response type)
  */
-function createMainContent(content) {
+function createMainContent(content, subtype) {
     const div = document.createElement('div');
-    div.className = 'bg-white border border-gray-200 rounded-lg p-6';
     
-    // Check if content contains clarification options (array of rewrites)
-    if (content.clarification_options && Array.isArray(content.clarification_options)) {
+    if (subtype === 'clarification') {
         // CLARIFICATION response type
+        div.className = 'bg-white border border-gray-200 rounded-lg p-6 mb-4';
         div.innerHTML = `
             <h2 class="text-xl font-semibold text-gray-900 mb-3">Your question needs clarification</h2>
-            <p class="text-gray-700 mb-4">${escapeHtml(content.message)}</p>
+            <p class="text-gray-700 mb-4">${escapeHtml(content.reasoning)}</p>
             <div class="space-y-2">
                 <p class="text-sm font-medium text-gray-700 mb-2">Suggested rewrites (click to use):</p>
                 ${content.clarification_options.map((option, index) => `
                     <button 
                         class="clarification-option w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        data-rewrite="${escapeHtml(option)}"
+                        data-rewrite="${escapeHtml(option.rewritten_question)}"
                     >
-                        <span class="text-blue-900">${index + 1}. ${escapeHtml(option)}</span>
+                        <span class="text-blue-900">${index + 1}. ${escapeHtml(option.rewritten_question)}</span>
                     </button>
                 `).join('')}
             </div>
@@ -260,37 +259,39 @@ function createMainContent(content) {
                 populateInputWithRewrite(rewrite);
             });
         });
-    } else if (content.confirmed_prompt) {
+    } else if (subtype === 'confirmation') {
         // CONFIRMATION response type
-        div.className = 'bg-white border-2 border-green-500 rounded-lg p-6';
+        div.className = 'bg-green-50 border-2 border-green-500 rounded-lg p-6 mb-4';
         div.innerHTML = `
-            <div class="flex items-start mb-4">
-                <div class="flex-shrink-0 mr-4">
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            <div class="flex items-start gap-4 mb-6">
+                <div class="flex-shrink-0">
+                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
                     </div>
                 </div>
-                <div class="flex-1">
-                    <h2 class="text-2xl font-bold text-green-700 mb-2">Your question is well-structured</h2>
-                    <p class="text-gray-700">${escapeHtml(content.message)}</p>
+                <div class="flex-1 pt-2">
+                    <h2 class="text-3xl font-bold text-green-700 mb-2">Your question is well-structured</h2>
+                    <p class="text-gray-800 text-lg">This question is clear and specific enough for research purposes.</p>
                 </div>
             </div>
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4">
-                <p class="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Confirmed Prompt</p>
-                <p class="text-gray-900 leading-relaxed">"${escapeHtml(content.confirmed_prompt)}"</p>
+            <div class="bg-white border border-gray-300 rounded-lg p-5">
+                <p class="text-xs font-bold text-gray-600 mb-3 uppercase tracking-wider">Confirmed Prompt</p>
+                <p class="text-gray-900 text-base leading-relaxed">"${escapeHtml(content)}"</p>
             </div>
         `;
-    } else if (content.redirect_message) {
+    } else if (subtype === 'out_of_scope') {
         // OUT_OF_SCOPE response type
+        div.className = 'bg-white border border-gray-200 rounded-lg p-6 mb-4';
         div.innerHTML = `
             <h2 class="text-xl font-semibold text-amber-700 mb-3">Out of scope</h2>
-            <p class="text-gray-700">${escapeHtml(content.redirect_message)}</p>
+            <p class="text-gray-700">${escapeHtml(content)}</p>
         `;
     } else {
         // Fallback for unexpected content structure
-        div.innerHTML = `<p class="text-gray-700">${escapeHtml(content.message || JSON.stringify(content))}</p>`;
+        div.className = 'bg-white border border-gray-200 rounded-lg p-6 mb-4';
+        div.innerHTML = `<p class="text-gray-700">${escapeHtml(typeof content === 'string' ? content : JSON.stringify(content))}</p>`;
     }
     
     return div;
@@ -301,7 +302,7 @@ function createMainContent(content) {
  */
 function createHealthcareReminder(content) {
     const div = document.createElement('div');
-    div.className = 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg';
+    div.className = 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-4';
     div.innerHTML = `
         <div class="flex items-start">
             <div class="flex-shrink-0">
@@ -318,19 +319,32 @@ function createHealthcareReminder(content) {
 }
 
 /**
- * Create footer block (gray text)
+ * Create closing message block (result footer - NOT page footer)
+ * Styling varies based on content (success state gets prominent styling)
  */
-function createFooter(content) {
+function createClosingMessage(content) {
     const div = document.createElement('div');
-    div.className = 'text-sm text-gray-600 italic';
-    div.innerHTML = `<p>${escapeHtml(content)}</p>`;
+    
+    // Check if this is the success/confirmation message
+    const isSuccessMessage = content.includes('can be used safely');
+    
+    if (isSuccessMessage) {
+        // Prominent styling for success state
+        div.className = 'bg-green-100 border-l-4 border-green-600 p-4 rounded-r-lg mb-4';
+        div.innerHTML = `<p class="text-base font-semibold text-green-800">${escapeHtml(content)}</p>`;
+    } else {
+        // Standard styling for other messages (clarification)
+        div.className = 'text-sm text-gray-600 italic mb-4';
+        div.innerHTML = `<p>${escapeHtml(content)}</p>`;
+    }
+    
     return div;
 }
 
 /**
  * Create "Ask Another Question" button
  */
-function createTryAgainButton() {
+function createAskAnotherButton() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'w-full mt-6 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2';
