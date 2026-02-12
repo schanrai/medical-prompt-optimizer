@@ -32,7 +32,7 @@ HEALTHCARE_REMINDER = "If you're experiencing symptoms, please consult a healthc
 
 # Per-response-type footers (decided in Phase 4 planning)
 FOOTER_CLARIFICATION = "Pick or revise, then use with your preferred research tool or LLM chatbot."
-FOOTER_CONFIRMATION = "Revise if needed, then use with your preferred research tool or LLM chatbot."
+FOOTER_CONFIRMATION = "Your question can be used safely with your preferred research tool or LLM chatbot."
 # No footer for OUT_OF_SCOPE -- redirect messages are self-contained
 
 # Privacy and page-level copy
