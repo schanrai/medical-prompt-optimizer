@@ -17,7 +17,7 @@ import logging
 
 from src.pipeline import run_pipeline
 from src.exceptions import MPOError
-from src.schemas import ResponseType
+from src.schemas import ResponseType, ValidationResultModel, ValidationResult
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -48,8 +48,12 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # Request/Response models
 class QuestionRequest(BaseModel):
-    """Request model for /api/check endpoint."""
-    question: str = Field(..., min_length=1, max_length=2000, description="Medical research question to optimize")
+    """Request model for /api/check endpoint.
+    
+    No length constraints here -- Stage 0 validation in the pipeline handles
+    length checks with user-friendly rejection messages instead of raw 422 errors.
+    """
+    question: str = Field(..., description="Medical research question to optimize")
 
 
 class APIResponse(BaseModel):
@@ -143,8 +147,16 @@ async def check_question(request: QuestionRequest):
     try:
         logger.info(f"Received question: {request.question[:100]}...")
         
-        # Run through pipeline
+        # Run through pipeline (includes Stage 0 validation)
         result = run_pipeline(request.question)
+        
+        # Check if Stage 0 rejected the input
+        if isinstance(result, ValidationResultModel):
+            logger.info(f"Stage 0 rejected: {result.validation_result.value}")
+            return APIResponse(
+                success=False,
+                error=result.rejection_message
+            )
         
         # Convert Pydantic model to dict for JSON response
         result_dict = result.model_dump()

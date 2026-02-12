@@ -18,9 +18,11 @@ from datetime import datetime
 from src.call_1_scope import run_call_1
 from src.call_2_classify import run_call_2
 from src.call_3_clarify import run_call_3
+from src.validation import validate_input
 from src.schemas import (
     Call1Response, Call2Response, Call3Response,
     FinalResponseReady, FinalResponseUnderspecified, FinalResponseOutOfScope,
+    ValidationResultModel, ValidationResult,
     PipelineSummary, ScopeResult, Classification, ResponseType
 )
 from src.constants import OUT_OF_SCOPE_SECURITY, OUT_OF_SCOPE_NON_ENGLISH, OUT_OF_SCOPE_NON_MEDICAL, PROMPT_VERSION
@@ -32,7 +34,7 @@ import time
 def run_pipeline(
     user_input: str,
     question_id: Optional[str] = None
-) -> Union[FinalResponseReady, FinalResponseUnderspecified, FinalResponseOutOfScope]:
+) -> Union[FinalResponseReady, FinalResponseUnderspecified, FinalResponseOutOfScope, ValidationResultModel]:
     """
     Run the full Medical Research Prompt Optimizer pipeline.
     
@@ -42,6 +44,7 @@ def run_pipeline(
     
     Returns:
         One of:
+        - ValidationResultModel: Input failed Stage 0 validation (REJECT_*)
         - FinalResponseReady: Question is well-formed, returns confirmation
         - FinalResponseUnderspecified: Question needs clarification, returns options
         - FinalResponseOutOfScope: Question is out of scope, returns redirect message
@@ -57,6 +60,17 @@ def run_pipeline(
     input_hash = compute_input_hash(user_input)
     
     log_step("Pipeline Start", question_id=question_id, details={"input_length": len(user_input)})
+    
+    # ==========================================
+    # STAGE 0: Code Input Validation (Pre-LLM)
+    # ==========================================
+    validation_result = validate_input(user_input, question_id)
+    if validation_result.validation_result != ValidationResult.PASS:
+        log_step("Pipeline Complete", question_id=question_id, details={
+            "path": "VALIDATION_REJECTED",
+            "reason": validation_result.validation_result.value
+        })
+        return validation_result
     
     # ==========================================
     # CALL 1: Scope + Security Gate
