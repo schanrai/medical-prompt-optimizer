@@ -236,17 +236,25 @@ function createMainContent(content, subtype) {
     if (subtype === 'clarification') {
         // CLARIFICATION response type
         div.className = 'bg-white border border-gray-200 rounded-lg p-6 mb-4';
+        
+        // Format reasoning as bullet points for better readability
+        const reasoningSentences = content.reasoning.split(/\.\s+/).filter(s => s.trim().length > 0);
+        const reasoningHtml = reasoningSentences.length > 1 
+            ? `<ul class="list-disc list-inside text-gray-700 mb-4 space-y-1">${reasoningSentences.map(s => `<li>${escapeHtml(s.trim())}.</li>`).join('')}</ul>`
+            : `<p class="text-gray-700 mb-4">${escapeHtml(content.reasoning)}</p>`;
+        
         div.innerHTML = `
             <h2 class="text-3xl font-bold text-amber-700 mb-3">Your question needs clarification</h2>
-            <p class="text-gray-700 mb-4">${escapeHtml(content.reasoning)}</p>
-            <div class="space-y-2">
+            ${reasoningHtml}
+            <div class="space-y-3">
                 <p class="text-sm font-medium text-gray-700 mb-2">Suggested rewrites (click to use):</p>
                 ${content.clarification_options.map((option, index) => `
                     <button 
                         class="clarification-option w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         data-rewrite="${escapeHtml(option.rewritten_question)}"
                     >
-                        <span class="text-blue-900">${index + 1}. ${escapeHtml(option.rewritten_question)}</span>
+                        <div class="font-semibold text-blue-900 mb-1">${index + 1}. ${escapeHtml(option.label)}</div>
+                        <div class="text-blue-800 text-sm">${escapeHtml(option.rewritten_question)}</div>
                     </button>
                 `).join('')}
             </div>
