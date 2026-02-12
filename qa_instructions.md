@@ -54,3 +54,6 @@ curl -X POST http://localhost:8000/api/check \
 curl -X POST http://localhost:8000/api/check \
   -H "Content-Type: application/json" \
   -d '{"question": "What causes chest pain?"}'
+
+
+  

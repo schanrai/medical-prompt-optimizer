@@ -16,6 +16,7 @@ from pathlib import Path
 import logging
 
 from src.pipeline import run_pipeline
+from src.response_assembly import assemble_display_blocks
 from src.exceptions import MPOError
 from src.schemas import ResponseType, ValidationResultModel, ValidationResult
 
@@ -158,11 +159,17 @@ async def check_question(request: QuestionRequest):
                 error=result.rejection_message
             )
         
+        # Assemble display blocks from pipeline result
+        display_blocks = assemble_display_blocks(result)
+        
         # Convert Pydantic model to dict for JSON response
         result_dict = result.model_dump()
         
+        # Add display_blocks to the response
+        result_dict['display_blocks'] = display_blocks
+        
         # Log result type
-        logger.info(f"Pipeline result: {result.response_type.value}, calls_made={result.pipeline_summary.calls_made}")
+        logger.info(f"Pipeline result: {result.response_type.value}, calls_made={result.pipeline_summary.calls_made}, blocks={len(display_blocks)}")
         
         return APIResponse(
             success=True,

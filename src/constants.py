@@ -24,13 +24,20 @@ CALL_3_PARAMS = {
     "temperature": 0.3,  # Deterministic clarification generation
 }
 
-# Static copy strings (from spec lines 1030-1037)
+# Static copy strings (from spec lines 1030-1037 + Phase 4 decisions)
 EMERGENCY_WARNING = """⚠️ URGENT: If you're experiencing a medical emergency, call 911 immediately.
 For poison emergencies, call Poison Control: 1-800-222-1222."""
 
 HEALTHCARE_REMINDER = "If you're experiencing symptoms, please consult a healthcare provider."
 
-FOOTER = "Select or revise, then use with your preferred research tool."
+# Per-response-type footers (decided in Phase 4 planning)
+FOOTER_CLARIFICATION = "Pick or revise, then use with your preferred research tool or LLM chatbot."
+FOOTER_CONFIRMATION = "Revise if needed, then use with your preferred research tool or LLM chatbot."
+# No footer for OUT_OF_SCOPE -- redirect messages are self-contained
+
+# Privacy and page-level copy
+PRIVACY_NOTICE = "Your questions are processed securely and are not stored or used for AI model training."
+PAGE_DISCLAIMER = "This tool does not answer questions or provide medical advice. It helps you frame better research prompts."
 
 # OUT_OF_SCOPE response templates (from spec lines 524-551)
 OUT_OF_SCOPE_SECURITY = """This tool is designed to help frame medical research questions.
