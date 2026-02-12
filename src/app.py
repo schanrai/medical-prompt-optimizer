@@ -19,6 +19,7 @@ from src.pipeline import run_pipeline
 from src.response_assembly import assemble_display_blocks
 from src.exceptions import MPOError
 from src.schemas import ResponseType, ValidationResultModel, ValidationResult
+from src.constants import PRIVACY_NOTICE, PAGE_DISCLAIMER
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -69,64 +70,13 @@ async def root(request: Request):
     """
     Serve the HTML form UI.
     
-    Phase 4 will populate templates/index.html.
-    For now, return a basic placeholder.
+    Passes static copy constants to the template for rendering.
     """
-    # Check if index.html exists
-    index_path = TEMPLATES_DIR / "index.html"
-    
-    if index_path.exists():
-        return templates.TemplateResponse("index.html", {"request": request})
-    else:
-        # Placeholder until Phase 4
-        return HTMLResponse(content="""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Medical Research Prompt Optimizer</title>
-            <style>
-                body { 
-                    font-family: Arial, sans-serif; 
-                    max-width: 800px; 
-                    margin: 50px auto; 
-                    padding: 20px;
-                }
-                .info { 
-                    background: #e3f2fd; 
-                    padding: 20px; 
-                    border-radius: 8px; 
-                    border-left: 4px solid #2196f3;
-                }
-                code { 
-                    background: #f5f5f5; 
-                    padding: 2px 6px; 
-                    border-radius: 3px;
-                    font-family: monospace;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>Medical Research Prompt Optimizer</h1>
-            <div class="info">
-                <h2>API is Running ✓</h2>
-                <p>Phase 3 complete! The FastAPI backend is ready.</p>
-                <p><strong>API Endpoint:</strong> <code>POST /api/check</code></p>
-                <p><strong>Example request:</strong></p>
-                <pre><code>{
-  "question": "What does research say about vitamin D for bone health?"
-}</code></pre>
-                <p><strong>Phase 4 (UI):</strong> Coming soon - HTML form interface will be added here.</p>
-                <p>For now, you can test the API using:</p>
-                <ul>
-                    <li>curl</li>
-                    <li>Postman</li>
-                    <li>Python requests</li>
-                    <li>The interactive test script: <code>python test_interactive.py</code></li>
-                </ul>
-            </div>
-        </body>
-        </html>
-        """)
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "privacy_notice": PRIVACY_NOTICE,
+        "page_disclaimer": PAGE_DISCLAIMER
+    })
 
 
 @app.post("/api/check", response_model=APIResponse)
