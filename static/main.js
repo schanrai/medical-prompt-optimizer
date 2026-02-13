@@ -237,11 +237,8 @@ function createMainContent(content, subtype) {
         // CLARIFICATION response type
         div.className = 'bg-white border border-gray-200 rounded-lg p-6 mb-4';
         
-        // Format reasoning as bullet points for better readability
-        const reasoningSentences = content.reasoning.split(/\.\s+/).filter(s => s.trim().length > 0);
-        const reasoningHtml = reasoningSentences.length > 1 
-            ? `<ul class="list-disc list-inside text-gray-700 mb-4 space-y-1">${reasoningSentences.map(s => `<li>${escapeHtml(s.trim())}.</li>`).join('')}</ul>`
-            : `<p class="text-gray-700 mb-4">${escapeHtml(content.reasoning)}</p>`;
+        // Display reasoning as paragraph (educational content for users)
+        const reasoningHtml = `<p class="text-gray-700 mb-4">${escapeHtml(content.reasoning)}</p>`;
         
         div.innerHTML = `
             <h2 class="text-3xl font-bold text-amber-700 mb-3">Your question needs clarification</h2>
@@ -291,10 +288,22 @@ function createMainContent(content, subtype) {
         `;
     } else if (subtype === 'out_of_scope') {
         // OUT_OF_SCOPE response type
-        div.className = 'bg-white border border-gray-200 rounded-lg p-6 mb-4';
+        div.className = 'bg-red-50 border-2 border-red-500 rounded-lg p-6 mb-4';
         div.innerHTML = `
-            <h2 class="text-xl font-semibold text-amber-700 mb-3">Out of scope</h2>
-            <p class="text-gray-700">${escapeHtml(content)}</p>
+            <div class="flex items-start gap-4 mb-4">
+                <div class="flex-shrink-0">
+                    <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1 pt-2">
+                    <h2 class="text-3xl font-bold text-red-700 mb-3">Out of scope</h2>
+                    <p class="text-gray-800 text-lg leading-relaxed">${escapeHtml(content)}</p>
+                </div>
+            </div>
         `;
     } else {
         // Fallback for unexpected content structure
