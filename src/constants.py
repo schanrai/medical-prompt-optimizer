@@ -16,7 +16,7 @@ CALL_1_PARAMS = {
 
 CALL_2_MODEL = "anthropic/claude-sonnet-4-5"    # Classification
 CALL_2_PARAMS = {
-    "temperature": 0.3,  # Deterministic classification (medical safety)
+    "temperature": 0.1,  # Deterministic classification (medical safety)
 }
 
 CALL_3_MODEL = "anthropic/claude-sonnet-4-5"  # Clarification Generator
