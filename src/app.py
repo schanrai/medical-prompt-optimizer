@@ -79,6 +79,16 @@ async def root(request: Request):
     })
 
 
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy(request: Request):
+    """
+    Serve the privacy policy page.
+    """
+    return templates.TemplateResponse("privacy.html", {
+        "request": request
+    })
+
+
 @app.post("/api/check", response_model=APIResponse)
 async def check_question(request: QuestionRequest):
     """
