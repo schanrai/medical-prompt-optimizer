@@ -9,7 +9,7 @@ reminder, footer. The UI renders these blocks without hardcoding any
 safety-critical copy.
 
 Block ordering per spec lines 904-910:
-1. [Emergency block] <- only if emergency_language_detected == true
+1. [Crisis block]    <- self-harm (988) > physical emergency (911), shown as banner
 2. [Main content]    <- confirmed_prompt, clarification_options, or redirect_message
 3. [Healthcare reminder] <- only if include_healthcare_reminder == true
 4. [Footer]          <- CONFIRMATION and CLARIFICATION only (not OUT_OF_SCOPE)
@@ -24,6 +24,8 @@ from src.schemas import (
 )
 from src.constants import (
     EMERGENCY_WARNING,
+    SELF_HARM_WARNING,
+    DRUG_SEEKING_SUPPORT,
     HEALTHCARE_REMINDER,
     FOOTER_CLARIFICATION,
     FOOTER_CONFIRMATION,
@@ -44,17 +46,34 @@ def assemble_display_blocks(
         The UI renders these in order without hardcoding any copy.
 
     Block types:
-    - emergency_warning: Red/amber banner (only if emergency_language_detected)
+    - crisis_warning: Red banner for self-harm (988) or physical emergency (911)
     - main_content: Response-type-specific content (varies by path)
     - healthcare_reminder: Muted info block (only if include_healthcare_reminder)
     - footer: Subtle text at bottom (CONFIRMATION and CLARIFICATION only)
+
+    Crisis banner priority: self-harm (988) > drug-seeking (SAMHSA) > physical emergency (911).
+    Only one crisis banner shown.
     """
     blocks = []
 
-    # Block 1: Emergency warning (prepend if flagged)
-    if response.emergency_language_detected:
+    # Block 1: Crisis warning (prepend if flagged)
+    # Priority: self-harm > drug-seeking > physical emergency (only one banner shown)
+    if response.self_harm_language_detected:
         blocks.append({
-            "type": "emergency_warning",
+            "type": "crisis_warning",
+            "subtype": "self_harm",
+            "content": SELF_HARM_WARNING
+        })
+    elif response.drug_seeking_detected:
+        blocks.append({
+            "type": "crisis_warning",
+            "subtype": "drug_seeking",
+            "content": DRUG_SEEKING_SUPPORT
+        })
+    elif response.emergency_language_detected:
+        blocks.append({
+            "type": "crisis_warning",
+            "subtype": "emergency",
             "content": EMERGENCY_WARNING
         })
 
@@ -150,8 +169,9 @@ if __name__ == "__main__":
     print(f"Blocks: {len(blocks1)}")
     for i, block in enumerate(blocks1, 1):
         print(f"  {i}. {block['type']}: {block['content'][:60] if isinstance(block['content'], str) else 'structured data'}...")
-    assert len(blocks1) == 4, "Should have 4 blocks: emergency, main, healthcare, footer"
-    assert blocks1[0]['type'] == 'emergency_warning'
+    assert len(blocks1) == 4, "Should have 4 blocks: crisis_warning, main, healthcare, footer"
+    assert blocks1[0]['type'] == 'crisis_warning'
+    assert blocks1[0]['subtype'] == 'emergency'
     assert blocks1[1]['type'] == 'main_content'
     assert blocks1[2]['type'] == 'healthcare_reminder'
     assert blocks1[3]['type'] == 'footer'
@@ -240,6 +260,67 @@ if __name__ == "__main__":
     assert blocks4[1]['type'] == 'healthcare_reminder'
     assert blocks4[2]['type'] == 'footer'
     print("✅ All assertions passed")
+
+    # Test 5: CLARIFICATION with self-harm (988 banner + pipeline continues)
+    print("\n--- Test 5: CLARIFICATION (self-harm + healthcare) ---")
+    response5 = FinalResponseUnderspecified(
+        question_id="test-5",
+        response_type=ResponseType.CLARIFICATION,
+        original_question="I've been having suicidal thoughts. What does research say about ketamine for depression?",
+        triggered_rules=["missing_population"],
+        reasoning="Missing population details",
+        clarification_options=[
+            ClarificationOption(label="For adults", rewritten_question="What does research say about ketamine for treatment-resistant depression in adults?"),
+            ClarificationOption(label="For adolescents", rewritten_question="What does research say about ketamine for treatment-resistant depression in adolescents?"),
+        ],
+        include_healthcare_reminder=True,
+        self_harm_language_detected=True,
+        pipeline_summary=PipelineSummary(
+            calls_made=3,
+            call_1_result="IN_SCOPE",
+            call_2_result="UNDERSPECIFIED",
+            call_2_triggered_rules=["missing_population"]
+        ),
+        timestamp=datetime.utcnow().isoformat() + "Z"
+    )
+    blocks5 = assemble_display_blocks(response5)
+    print(f"Blocks: {len(blocks5)}")
+    for i, block in enumerate(blocks5, 1):
+        print(f"  {i}. {block['type']}: {block['content'][:60] if isinstance(block['content'], str) else 'structured data'}...")
+    assert len(blocks5) == 4, "Should have 4 blocks: crisis_warning (988), main, healthcare, footer"
+    assert blocks5[0]['type'] == 'crisis_warning'
+    assert blocks5[0]['subtype'] == 'self_harm'
+    assert '988' in blocks5[0]['content']
+    assert blocks5[1]['type'] == 'main_content'
+    assert blocks5[2]['type'] == 'healthcare_reminder'
+    assert blocks5[3]['type'] == 'footer'
+    print("✅ All assertions passed")
+
+    # Test 6: Self-harm takes priority over emergency (both flagged)
+    print("\n--- Test 6: CONFIRMATION (self-harm + emergency = 988 priority) ---")
+    response6 = FinalResponseReady(
+        question_id="test-6",
+        response_type=ResponseType.CONFIRMATION,
+        original_question="I want to die and I'm having chest pain",
+        confirmed_prompt="I want to die and I'm having chest pain",
+        include_healthcare_reminder=True,
+        emergency_language_detected=True,
+        self_harm_language_detected=True,
+        pipeline_summary=PipelineSummary(
+            calls_made=2,
+            call_1_result="IN_SCOPE",
+            call_2_result="READY"
+        ),
+        timestamp=datetime.utcnow().isoformat() + "Z"
+    )
+    blocks6 = assemble_display_blocks(response6)
+    print(f"Blocks: {len(blocks6)}")
+    for i, block in enumerate(blocks6, 1):
+        print(f"  {i}. {block['type']}: {block['content'][:60] if isinstance(block['content'], str) else 'structured data'}...")
+    assert blocks6[0]['type'] == 'crisis_warning'
+    assert blocks6[0]['subtype'] == 'self_harm', "Self-harm should take priority over emergency"
+    assert '988' in blocks6[0]['content']
+    print("✅ All assertions passed (988 takes priority over 911)")
 
     print("\n" + "=" * 70)
     print("All tests passed!")

@@ -189,6 +189,7 @@ function createDisplayBlock(block) {
     
     switch (type) {
         case 'emergency_warning':
+        case 'crisis_warning':
             return createEmergencyWarning(content);
         
         case 'main_content':

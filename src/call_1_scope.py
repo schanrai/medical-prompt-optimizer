@@ -73,10 +73,15 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
     is_english = response.get('is_english', False)
     is_medical = response.get('is_medical', False)
     emergency_language_detected = response.get('emergency_language_detected', False)
+    self_harm_language_detected = response.get('self_harm_language_detected', False)
+    drug_seeking_detected = response.get('drug_seeking_detected', False)
     
     if security_violation:
         scope_result = ScopeResult.OUT_OF_SCOPE
         out_of_scope_reason = OutOfScopeReason.SECURITY_VIOLATION
+    elif drug_seeking_detected:
+        scope_result = ScopeResult.OUT_OF_SCOPE
+        out_of_scope_reason = OutOfScopeReason.DRUG_SEEKING
     elif not is_english:
         scope_result = ScopeResult.OUT_OF_SCOPE
         out_of_scope_reason = OutOfScopeReason.NON_ENGLISH
@@ -107,6 +112,8 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
             security_violation=security_violation,
             security_type=security_type,
             emergency_language_detected=emergency_language_detected,
+            self_harm_language_detected=self_harm_language_detected,
+            drug_seeking_detected=drug_seeking_detected,
             reasoning=response.get('reasoning', ''),
             scope_result=scope_result,
             out_of_scope_reason=out_of_scope_reason,
@@ -125,6 +132,8 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
         "scope_result": scope_result.value,
         "security_violation": security_violation,
         "emergency_language_detected": emergency_language_detected,
+        "self_harm_language_detected": self_harm_language_detected,
+        "drug_seeking_detected": drug_seeking_detected,
         "tokens": token_count,
         "latency_ms": latency_ms
     })
@@ -170,6 +179,8 @@ if __name__ == "__main__":
             print(f"   Security violation: {result.security_violation}")
             print(f"   Security type: {result.security_type.value}")
             print(f"   Emergency detected: {result.emergency_language_detected}")
+            print(f"   Self-harm detected: {result.self_harm_language_detected}")
+            print(f"   Drug-seeking detected: {result.drug_seeking_detected}")
             print(f"   Reasoning: {result.reasoning}")
             print(f"   Tokens: {result.token_count}, Latency: {result.latency_ms}ms")
         except MPOError as e:

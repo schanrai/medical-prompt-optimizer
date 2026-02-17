@@ -34,6 +34,7 @@ class OutOfScopeReason(str, Enum):
     NON_ENGLISH = "NON_ENGLISH"
     NON_MEDICAL = "NON_MEDICAL"
     SECURITY_VIOLATION = "SECURITY_VIOLATION"
+    DRUG_SEEKING = "DRUG_SEEKING"
 
 
 class Classification(str, Enum):
@@ -72,6 +73,8 @@ class Call1Response(BaseModel):
     security_violation: bool
     security_type: SecurityType
     emergency_language_detected: bool
+    self_harm_language_detected: bool
+    drug_seeking_detected: bool
     reasoning: str
     scope_result: ScopeResult
     out_of_scope_reason: Optional[OutOfScopeReason] = None
@@ -127,6 +130,8 @@ class FinalResponseReady(BaseModel):
     confirmed_prompt: str
     include_healthcare_reminder: bool
     emergency_language_detected: bool = False
+    self_harm_language_detected: bool = False
+    drug_seeking_detected: bool = False
     pipeline_summary: PipelineSummary
     timestamp: str
 
@@ -140,6 +145,8 @@ class FinalResponseUnderspecified(BaseModel):
     clarification_options: List[ClarificationOption]
     include_healthcare_reminder: bool
     emergency_language_detected: bool = False
+    self_harm_language_detected: bool = False
+    drug_seeking_detected: bool = False
     pipeline_summary: PipelineSummary
     timestamp: str
 
@@ -152,6 +159,8 @@ class FinalResponseOutOfScope(BaseModel):
     security_type: SecurityType
     redirect_message: str
     emergency_language_detected: bool = False
+    self_harm_language_detected: bool = False
+    drug_seeking_detected: bool = False
     pipeline_summary: PipelineSummary
     timestamp: str
 

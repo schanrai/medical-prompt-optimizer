@@ -30,12 +30,20 @@ CALL_1_SCHEMA = {
             "type": "boolean",
             "description": "Whether the user appears to be in an active medical crisis right now"
         },
+        "self_harm_language_detected": {
+            "type": "boolean",
+            "description": "Whether input expresses suicidal ideation or self-harm intent"
+        },
+        "drug_seeking_detected": {
+            "type": "boolean",
+            "description": "Whether input requests medication access without prescription"
+        },
         "reasoning": {
             "type": "string",
             "description": "Brief explanation of the classification decision"
         }
     },
-    "required": ["is_english", "is_medical", "security_violation", "security_type", "emergency_language_detected", "reasoning"],
+    "required": ["is_english", "is_medical", "security_violation", "security_type", "emergency_language_detected", "self_harm_language_detected", "drug_seeking_detected", "reasoning"],
     "additionalProperties": False
 }
 

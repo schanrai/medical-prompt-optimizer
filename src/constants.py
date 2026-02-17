@@ -28,6 +28,20 @@ CALL_3_PARAMS = {
 EMERGENCY_WARNING = """⚠️ URGENT: If you're experiencing a medical emergency, call 911 immediately.
 For poison emergencies, call Poison Control: 1-800-222-1222."""
 
+SELF_HARM_WARNING = """🆘 CRISIS SUPPORT: If you're thinking about suicide or self-harm, help is available 24/7.
+
+988 Suicide & Crisis Lifeline: Call or text 988
+Crisis Text Line: Text HOME to 741741
+
+You are not alone. Trained counselors are ready to listen."""
+
+DRUG_SEEKING_REJECTION = "This tool is designed for general medical research questions, not medication access requests."
+
+DRUG_SEEKING_SUPPORT = """If you're struggling with substance use, confidential help is available:
+
+SAMHSA National Helpline: 1-800-662-4357 (24/7, free, confidential)
+This service provides referrals to local treatment facilities and support groups."""
+
 HEALTHCARE_REMINDER = "If you're experiencing symptoms, please consult a healthcare provider."
 
 # Per-response-type footers (decided in Phase 4 planning)
