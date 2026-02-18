@@ -27,7 +27,7 @@ from src.schemas import (
 )
 from src.constants import (
     OUT_OF_SCOPE_SECURITY, OUT_OF_SCOPE_NON_ENGLISH, OUT_OF_SCOPE_NON_MEDICAL,
-    DRUG_SEEKING_REJECTION, PROMPT_VERSION,
+    OUT_OF_SCOPE_PASTED_DOCUMENTS, DRUG_SEEKING_REJECTION, PROMPT_VERSION,
 )
 from src.telemetry import log_step, log_run, compute_input_hash
 from src.exceptions import MPOError
@@ -101,6 +101,9 @@ def run_pipeline(
         elif call1_response.out_of_scope_reason.value == "DRUG_SEEKING":
             redirect_message = DRUG_SEEKING_REJECTION
             routing_decision = "drug_seeking"
+        elif call1_response.out_of_scope_reason.value == "PASTED_MEDICAL_DOCUMENTS":
+            redirect_message = OUT_OF_SCOPE_PASTED_DOCUMENTS
+            routing_decision = "pasted_medical_documents"
         elif call1_response.out_of_scope_reason.value == "NON_ENGLISH":
             redirect_message = OUT_OF_SCOPE_NON_ENGLISH
             routing_decision = "non_english"

@@ -35,6 +35,7 @@ class OutOfScopeReason(str, Enum):
     NON_MEDICAL = "NON_MEDICAL"
     SECURITY_VIOLATION = "SECURITY_VIOLATION"
     DRUG_SEEKING = "DRUG_SEEKING"
+    PASTED_MEDICAL_DOCUMENTS = "PASTED_MEDICAL_DOCUMENTS"
 
 
 class Classification(str, Enum):
@@ -70,6 +71,7 @@ class Call1Response(BaseModel):
     call: Literal[1] = 1
     is_english: bool
     is_medical: bool
+    pasted_medical_documents: bool
     security_violation: bool
     security_type: SecurityType
     emergency_language_detected: bool

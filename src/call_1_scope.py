@@ -72,16 +72,21 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
     security_violation = response.get('security_violation', False)
     is_english = response.get('is_english', False)
     is_medical = response.get('is_medical', False)
+    pasted_medical_documents = response.get('pasted_medical_documents', False)
     emergency_language_detected = response.get('emergency_language_detected', False)
     self_harm_language_detected = response.get('self_harm_language_detected', False)
     drug_seeking_detected = response.get('drug_seeking_detected', False)
-    
+
+    # Routing priority: security > drug-seeking > pasted docs > language > medical scope
     if security_violation:
         scope_result = ScopeResult.OUT_OF_SCOPE
         out_of_scope_reason = OutOfScopeReason.SECURITY_VIOLATION
     elif drug_seeking_detected:
         scope_result = ScopeResult.OUT_OF_SCOPE
         out_of_scope_reason = OutOfScopeReason.DRUG_SEEKING
+    elif pasted_medical_documents:
+        scope_result = ScopeResult.OUT_OF_SCOPE
+        out_of_scope_reason = OutOfScopeReason.PASTED_MEDICAL_DOCUMENTS
     elif not is_english:
         scope_result = ScopeResult.OUT_OF_SCOPE
         out_of_scope_reason = OutOfScopeReason.NON_ENGLISH
@@ -109,6 +114,7 @@ def run_call_1(user_input: str, question_id: Optional[str] = None) -> Call1Respo
             call=1,
             is_english=is_english,
             is_medical=is_medical,
+            pasted_medical_documents=pasted_medical_documents,
             security_violation=security_violation,
             security_type=security_type,
             emergency_language_detected=emergency_language_detected,

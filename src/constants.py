@@ -65,10 +65,11 @@ Please resubmit your medical research question in English."""
 
 OUT_OF_SCOPE_NON_MEDICAL = """This tool is designed for medical research questions.
 
-Your question doesn't appear to be health-related. If it is, try rephrasing
-to make the health/medical topic clearer.
+Your question doesn't appear to be health-related. If it is, try rephrasing to make the health/medical topic clearer.
 
 Examples of medical research questions this tool can help with:
 - "What does the research say about [supplement/treatment] for [condition]?"
 - "How do [biomarker] levels vary across [populations]?"
 - "What are the known risks of [intervention] in [population]?"""
+
+OUT_OF_SCOPE_PASTED_DOCUMENTS = "We can't interpret personal lab results or medical records — only your healthcare provider can do that in the context of your full history. If a result raised a question you'd like to research, try rephrasing it as a general research question."

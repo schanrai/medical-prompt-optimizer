@@ -17,6 +17,10 @@ CALL_1_SCHEMA = {
             "type": "boolean",
             "description": "Whether the input is about a medical/health topic"
         },
+        "pasted_medical_documents": {
+            "type": "boolean",
+            "description": "Whether the input is primarily pasted medical documents (lab results, test reports, records) requesting interpretation of personal results"
+        },
         "security_violation": {
             "type": "boolean",
             "description": "Whether the input contains injection/jailbreak/extraction attempts"
@@ -43,7 +47,7 @@ CALL_1_SCHEMA = {
             "description": "Brief explanation of the classification decision"
         }
     },
-    "required": ["is_english", "is_medical", "security_violation", "security_type", "emergency_language_detected", "self_harm_language_detected", "drug_seeking_detected", "reasoning"],
+    "required": ["is_english", "is_medical", "pasted_medical_documents", "security_violation", "security_type", "emergency_language_detected", "self_harm_language_detected", "drug_seeking_detected", "reasoning"],
     "additionalProperties": False
 }
 
