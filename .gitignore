@@ -28,6 +28,7 @@ logs/
 htmlcov/
 .tox/
 .hypothesis/
+test_results_*.json 
 
 # Type checking
 .mypy_cache/
