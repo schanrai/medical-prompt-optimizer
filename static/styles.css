@@ -1,19 +1,19 @@
-/* 
- * Medical Research Prompt Optimizer - Custom Styles
- * 
- * Minimal custom CSS for things Tailwind utilities cannot cover.
- * Most styling is handled by Tailwind classes in HTML and JS.
+/*
+ * Medical Question Framing Tool - Custom Styles
+ *
+ * Minimal custom CSS. Most styling via Tailwind classes in HTML and JS.
+ * See /static/design-system.md for full token reference.
  */
 
-/* Smooth transitions for dynamic content */
+/* Result area: fade in the container */
 #result-area {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeUp 0.2s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fadeUp {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(10px);
     }
     to {
         opacity: 1;
@@ -21,13 +21,13 @@
     }
 }
 
-/* Focus ring enhancement for accessibility */
-textarea:focus,
-button:focus {
-    outline: none;
+
+/* Pointer cursor on clarification option buttons */
+.clarification-option {
+    cursor: pointer;
 }
 
-/* Print styles (if user wants to save results) */
+/* Print styles */
 @media print {
     .no-print {
         display: none;

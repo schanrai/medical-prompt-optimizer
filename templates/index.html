@@ -3,71 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Research Question Framing Tool</title>
+    <title>Medical Question Framing Tool</title>
+
+    <!-- Tailwind CDN with custom design token config -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        warm: {
+                            50:  '#F9F8F6',   /* page background */
+                            100: '#EFE9E3',   /* card borders, input borders */
+                            200: '#D9CFC7',   /* dividers */
+                            300: '#C9B59C',   /* decorative only — not for text */
+                            600: '#6B5C54',   /* secondary text: subtitles, body, disclaimers */
+                            700: '#4A3B34',   /* tertiary text: labels, meta, word counter */
+                            900: '#2C2420',   /* primary text: headings */
+                        },
+                        brand: {
+                            500: '#2C2420',   /* primary action — warm dark brown */
+                            600: '#3D3330',   /* primary hover */
+                            700: '#1A1512',   /* primary active/pressed */
+                        },
+                        danger: {
+                            50:  '#FDF1EE',
+                            500: '#C9634A',
+                            900: '#7A2D1E',
+                        },
+                        success: {
+                            50:  '#EFF4EE',
+                            500: '#5A8A5E',
+                            900: '#2D5230',
+                        },
+                        clarify: {
+                            50:  '#FDF5E8',
+                            500: '#C08A30',
+                            900: '#7A5210',
+                        },
+                        info: {
+                            50:  '#EEF1F8',
+                            500: '#5C6FAF',
+                            900: '#2D3F7A',
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="max-w-3xl mx-auto px-4 py-8">
-        <!-- Privacy Notice -->
-        <div class="mb-6 text-sm text-gray-600 text-center">
-            <p>{{ privacy_notice }} <a href="/privacy" class="text-blue-600 hover:text-blue-800 underline">Learn more</a></p>
+<body class="bg-warm-50 min-h-screen font-sans">
+    <div class="max-w-2xl mx-auto px-4 py-12">
+
+        <!-- Page Disclaimer -->
+        <div class="mb-6 text-xs text-warm-600 text-center">
+            <p>{{ page_disclaimer }}</p>
         </div>
 
         <!-- Main Card -->
-        <div class="bg-white rounded-lg shadow-md p-8">
+        <div class="bg-white rounded-2xl border border-warm-100 p-8 shadow-sm">
+
             <!-- Header -->
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Medical Research Question Framing Tool</h1>
-            <p class="text-gray-600 mb-8">Enter your question below. The tool will check if it's well-structured for research purposes.</p>
+            <h1 class="text-3xl font-bold text-warm-900 mb-2">Medical Question Framing Tool</h1>
+            <p class="text-sm text-warm-600 mb-8">Enter your question below. The tool will check if it's well-structured for research purposes.</p>
 
             <!-- Form -->
             <form id="question-form" class="space-y-4">
+
                 <!-- Textarea -->
                 <div>
-                    <label for="question-input" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="question-input" class="block text-xs font-medium text-warm-700 uppercase tracking-widest mb-2">
                         Your Question
                     </label>
-                    <textarea 
-                        id="question-input" 
+                    <textarea
+                        id="question-input"
                         name="question"
-                        rows="5" 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                        rows="5"
+                        class="w-full px-4 py-3 border border-warm-100 rounded-xl text-sm text-warm-900 placeholder-warm-200 resize-none transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-warm-900 focus:border-warm-900"
                         placeholder="Enter your medical research question"
                         aria-describedby="word-counter"
                     ></textarea>
-                    
+
                     <!-- Word Counter -->
-                    <div id="word-counter" class="mt-2 text-sm text-gray-500">
+                    <div id="word-counter" class="mt-2 text-xs text-warm-700">
                         <span id="word-count">0</span> words
-                        <span id="word-warning" class="text-amber-600 font-medium hidden ml-2">⚠️ Approaching limit (500 words)</span>
+                        <span id="word-warning" class="font-medium hidden ml-2">⚠ Approaching limit (500 words)</span>
                     </div>
                 </div>
 
                 <!-- Validation Error (hidden by default) -->
-                <div id="validation-error" class="hidden bg-red-50 border border-red-200 rounded-lg p-4">
-                    <p class="text-red-800 text-sm font-medium"></p>
+                <div id="validation-error" class="hidden bg-danger-50 border border-danger-500 rounded-xl p-4">
+                    <p class="text-sm font-medium text-danger-900"></p>
                 </div>
 
                 <!-- Submit Button -->
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     id="submit-btn"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    class="w-full bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold py-3 px-6 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-warm-900 focus:ring-offset-2"
                 >
                     Check Question
                 </button>
+
             </form>
 
             <!-- Result Area (hidden by default) -->
-            <div id="result-area" class="hidden mt-8 space-y-4">
-                <!-- Results will be rendered here by JavaScript -->
+            <div id="result-area" class="hidden mt-8 space-y-3">
+                <!-- Results rendered by main.js -->
             </div>
+
         </div>
 
-        <!-- Page Footer Disclaimer -->
-        <div class="mt-8 text-center text-sm text-gray-500">
-            <p>{{ page_disclaimer }}</p>
+        <!-- Privacy Notice -->
+        <div class="mt-8 text-center text-xs text-warm-600">
+            <p>{{ privacy_notice }} <a href="/privacy" class="text-warm-900 underline hover:text-warm-600 transition-colors duration-150">Learn more</a></p>
         </div>
+
     </div>
 
     <script src="/static/main.js"></script>
