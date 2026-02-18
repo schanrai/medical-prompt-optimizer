@@ -302,26 +302,13 @@ function createHealthcareReminder(content) {
 }
 
 /**
- * Footer block — subtle closing message, tone varies by response path
- * Success path: success token set | Clarification path: clarify token set
+ * Footer block — plain closing copy, no border or background.
+ * Intentionally low visual weight; just a quiet nudge, not an alert.
  */
 function createFooterBlock(content) {
     const div = document.createElement('div');
-
-    const isSuccess = content.includes('can be used safely');
-    const isClarification = content.includes('Pick or revise');
-
-    if (isSuccess) {
-        div.className = 'bg-success-50 border-l-4 border-success-500 p-4 rounded-r-xl';
-        div.innerHTML = `<p class="text-sm font-medium text-success-900">${escapeHtml(content)}</p>`;
-    } else if (isClarification) {
-        div.className = 'bg-clarify-50 border-l-4 border-clarify-500 p-4 rounded-r-xl';
-        div.innerHTML = `<p class="text-sm font-medium text-clarify-900">${escapeHtml(content)}</p>`;
-    } else {
-        div.className = 'bg-warm-50 border-l-4 border-warm-200 p-4 rounded-r-xl';
-        div.innerHTML = `<p class="text-sm font-medium text-warm-700">${escapeHtml(content)}</p>`;
-    }
-
+    div.className = 'pt-1';
+    div.innerHTML = `<p class="text-sm text-warm-600">${escapeHtml(content)}</p>`;
     return div;
 }
 

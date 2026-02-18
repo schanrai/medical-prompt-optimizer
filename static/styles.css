@@ -1,24 +1,30 @@
 /*
- * Medical Research Prompt Optimizer - Custom Styles
+ * Medical Question Framing Tool - Custom Styles
  *
  * Minimal custom CSS. Most styling via Tailwind classes in HTML and JS.
- * Focus ring handled by Tailwind utilities (focus:ring-brand-500) — no override needed.
+ * See /static/design-system.md for full token reference.
  */
 
-/* Result area fade-in */
+/* Result area: fade in the container */
 #result-area {
-    animation: fadeIn 0.25s ease-out;
+    animation: fadeUp 0.2s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fadeUp {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(10px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+
+/* Pointer cursor on clarification option buttons */
+.clarification-option {
+    cursor: pointer;
 }
 
 /* Print styles */
