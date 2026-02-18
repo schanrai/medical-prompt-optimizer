@@ -14,7 +14,7 @@ CALL_1_PARAMS = {
     "temperature": 0.0,  # Deterministic gate-keeping
 }
 
-CALL_2_MODEL = "anthropic/claude-sonnet-4-5"    # Classification
+CALL_2_MODEL = "anthropic/claude-sonnet-4-6"    # Classification (upgraded from sonnet-4-5 for better rule discernment)
 CALL_2_PARAMS = {
     "temperature": 0.1,  # Deterministic classification (medical safety)
 }
