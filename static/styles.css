@@ -1,19 +1,19 @@
-/* 
+/*
  * Medical Research Prompt Optimizer - Custom Styles
- * 
- * Minimal custom CSS for things Tailwind utilities cannot cover.
- * Most styling is handled by Tailwind classes in HTML and JS.
+ *
+ * Minimal custom CSS. Most styling via Tailwind classes in HTML and JS.
+ * Focus ring handled by Tailwind utilities (focus:ring-brand-500) — no override needed.
  */
 
-/* Smooth transitions for dynamic content */
+/* Result area fade-in */
 #result-area {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.25s ease-out;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
@@ -21,13 +21,7 @@
     }
 }
 
-/* Focus ring enhancement for accessibility */
-textarea:focus,
-button:focus {
-    outline: none;
-}
-
-/* Print styles (if user wants to save results) */
+/* Print styles */
 @media print {
     .no-print {
         display: none;
