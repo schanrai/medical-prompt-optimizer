@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from pathlib import Path
 import logging
+import os
 
 from src.pipeline import run_pipeline
 from src.response_assembly import assemble_display_blocks
@@ -37,9 +38,6 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 
 # Create templates directory if it doesn't exist
 TEMPLATES_DIR.mkdir(exist_ok=True)
-
-# Static files in /public are served by Vercel's CDN automatically.
-# No app.mount needed — see: https://vercel.com/docs/frameworks/backend/fastapi
 
 # Setup Jinja2 templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
@@ -194,6 +192,14 @@ async def api_info():
             "call_3": "Clarification Generator (if needed)"
         }
     }
+
+
+# Local dev: mount public/ at root so /styles.css and /main.js resolve correctly.
+# Must be added AFTER all routes so explicit routes take priority over the mount.
+# On Vercel (VERCEL=1), skipped entirely — CDN serves public/ automatically.
+if not os.getenv("VERCEL"):
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/", StaticFiles(directory=BASE_DIR / "public"), name="public")
 
 
 if __name__ == "__main__":

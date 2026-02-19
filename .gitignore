@@ -64,3 +64,5 @@ Thumbs.db
 *specification.md
 *.plan.md
 mpo_v1_implementation_f2864565.plan copy.md
+.vercel
+.env*.local
