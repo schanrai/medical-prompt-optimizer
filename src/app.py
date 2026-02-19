@@ -9,7 +9,6 @@ Endpoints:
 """
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from pathlib import Path
@@ -35,14 +34,12 @@ app = FastAPI(
 # Setup paths
 BASE_DIR = Path(__file__).parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
 
-# Create directories if they don't exist
+# Create templates directory if it doesn't exist
 TEMPLATES_DIR.mkdir(exist_ok=True)
-STATIC_DIR.mkdir(exist_ok=True)
 
-# Mount static files
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# Static files in /public are served by Vercel's CDN automatically.
+# No app.mount needed — see: https://vercel.com/docs/frameworks/backend/fastapi
 
 # Setup Jinja2 templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)

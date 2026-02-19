@@ -84,6 +84,9 @@ def log_run(entry: Dict[str, Any]) -> None:
                 f"latency: {entry.get('latency_ms', 0)}ms, "
                 f"tokens: {entry.get('token_count', 0)})")
     
-    # JSONL file output (append-only, one JSON object per line)
-    with open(TELEMETRY_FILE, "a", encoding="utf-8") as f:
-        f.write(json.dumps(entry) + "\n")
+    # JSONL file output (append-only); skip if read-only filesystem (e.g. Vercel)
+    try:
+        with open(TELEMETRY_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry) + "\n")
+    except OSError:
+        pass  # logs/ not writable; console output above is sufficient

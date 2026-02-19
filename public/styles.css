@@ -2,7 +2,7 @@
  * Medical Question Framing Tool - Custom Styles
  *
  * Minimal custom CSS. Most styling via Tailwind classes in HTML and JS.
- * See /static/design-system.md for full token reference.
+ * See /public/design-system.md for full token reference.
  */
 
 /* Result area: fade in the container */

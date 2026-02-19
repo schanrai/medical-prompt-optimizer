@@ -19,9 +19,12 @@ PROMPTS_DIR = PROJECT_ROOT / "prompts"
 LOGS_DIR = PROJECT_ROOT / "logs"
 DATA_DIR = PROJECT_ROOT / "data"
 
-# Ensure critical directories exist
-LOGS_DIR.mkdir(exist_ok=True)
-DATA_DIR.mkdir(exist_ok=True)
+# Ensure critical directories exist (skip on read-only filesystem, e.g. Vercel)
+try:
+    LOGS_DIR.mkdir(exist_ok=True)
+    DATA_DIR.mkdir(exist_ok=True)
+except OSError:
+    pass  # read-only env: telemetry will skip file writes
 
 # OpenRouter API configuration
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
