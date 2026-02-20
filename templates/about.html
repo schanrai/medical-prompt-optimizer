@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About &amp; FAQ - Medical Question Framing Tool</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        warm: {
+                            50:  '#F9F8F6',
+                            100: '#EFE9E3',
+                            200: '#D9CFC7',
+                            300: '#C9B59C',
+                            600: '#6B5C54',
+                            700: '#4A3B34',
+                            900: '#2C2420',
+                        },
+                        brand: {
+                            500: '#2C2420',
+                            600: '#3D3330',
+                        },
+                        clarify: {
+                            50:  '#FDF5E8',
+                            500: '#C08A30',
+                            900: '#7A5210',
+                        },
+                        info: {
+                            50:  '#EEF1F8',
+                            500: '#5C6FAF',
+                            900: '#2D3F7A',
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-warm-50 min-h-screen font-sans">
+    <div class="max-w-3xl mx-auto px-4 py-12">
+
+        <!-- Back link -->
+        <div class="mb-8">
+            <a href="/" class="text-warm-700 hover:text-warm-900 text-sm font-medium inline-flex items-center transition-colors duration-150">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to tool
+            </a>
+        </div>
+
+        <!-- Main content card -->
+        <div class="bg-white rounded-2xl border border-warm-100 p-8 shadow-sm">
+            <h1 class="text-3xl font-bold text-warm-900 mb-2">About</h1>
+            <p class="text-sm text-warm-600 mb-10">Why this tool exists and how it works.</p>
+
+            <div class="space-y-10">
+
+                <section>
+                    <h2 class="text-lg font-bold text-warm-900 mb-3">What this is</h2>
+                    <p class="text-sm text-warm-600 leading-relaxed">
+                        A tool that turns vague or risky medical questions into clearer, research-oriented prompts you can use in ChatGPT, Claude, or similar tools. It does <strong class="text-warm-900">not</strong> give medical advice or diagnose. It only helps you ask better questions.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-bold text-warm-900 mb-3">Why it exists</h2>
+                    <p class="text-sm text-warm-600 leading-relaxed mb-3">
+                        LLMs are good at answering when the question is clear and scoped; they're bad when the question is vague or sounds like &ldquo;tell me what to do.&rdquo; Small wording changes can change the answer (e.g. &ldquo;rest at home&rdquo; vs &ldquo;go to ER&rdquo;). This tool helps you ask in a way that's safer and more useful.
+                    </p>
+                    <p class="text-sm text-warm-600 leading-relaxed">
+                        By refining your question before you paste it into a chatbot, you get research-oriented prompts instead of advice-style answers.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-bold text-warm-900 mb-3">The problem we're addressing</h2>
+                    <p class="text-sm text-warm-600 leading-relaxed mb-3">
+                        Over 40 million people use ChatGPT for health information every day. Hallucinations are a real problem: studies report hallucination rates from about 1.5% to 23% on general medical queries, depending on task complexity. That can lead to harmful or incorrect medical information.
+                    </p>
+                    <p class="text-sm text-warm-600 leading-relaxed mb-3">
+                        Research shows that better prompting can reduce hallucinations—for example, from 66% to 44% in one study (<a href="https://www.nature.com/articles/s43856-025-01021-3" target="_blank" rel="noopener noreferrer" class="text-warm-900 underline hover:text-warm-600 transition-colors duration-150">Communications Medicine</a>). How you ask the question affects how reliable the answer is.
+                    </p>
+                    <p class="text-sm text-warm-600 leading-relaxed">
+                        People researching health conditions often have domain knowledge but rarely have training in research methodology. They may not know which details—population, comparison, outcome, or context—actually matter when framing a question for an LLM.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-bold text-warm-900 mb-3">What it does</h2>
+                    <p class="text-sm text-warm-600 leading-relaxed mb-3">
+                        This tool encourages questions that are grounded in what can be known and verified, rather than vague or advice-seeking. That helps you get more objective, less biased answers from the model.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-warm-600 space-y-2 ml-2">
+                        <li>Checks if the question is medical and in scope</li>
+                        <li>Clarifies missing pieces (e.g. population, comparison)</li>
+                        <li>Either gives you a ready-to-use prompt or suggests clarifications</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-bold text-warm-900 mb-4">FAQ</h2>
+                    <dl class="space-y-6">
+                        <div>
+                            <dt class="text-sm font-semibold text-warm-900 mb-1">Does it give medical advice?</dt>
+                            <dd class="text-sm text-warm-600 leading-relaxed">No. It only refines your question so you can use it in an LLM. It does not diagnose or recommend treatment.</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-semibold text-warm-900 mb-1">Can I use the output in ChatGPT / Claude?</dt>
+                            <dd class="text-sm text-warm-600 leading-relaxed">Yes. The output is a prompt you can copy and paste into any chatbot.</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-semibold text-warm-900 mb-1">What happens to my question?</dt>
+                            <dd class="text-sm text-warm-600 leading-relaxed">It is processed to run the pipeline (scope check, clarification, etc.). We do not store your questions. See the <a href="/privacy" class="text-warm-900 underline hover:text-warm-600 transition-colors duration-150">Privacy page</a> for details.</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-semibold text-warm-900 mb-1">Why was I shown crisis resources?</dt>
+                            <dd class="text-sm text-warm-600 leading-relaxed">The question contained language we treat as crisis-related. We show support resources (e.g. 988, SAMHSA) and do not answer as if it were a normal research question.</dd>
+                        </div>
+                    </dl>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-xs text-warm-600">
+            <p><a href="/" class="text-warm-900 underline hover:text-warm-600 font-medium transition-colors duration-150">Return to Medical Question Framing Tool</a></p>
+        </div>
+
+    </div>
+</body>
+</html>

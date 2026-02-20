@@ -8,12 +8,11 @@ Endpoints:
 - POST /api/check: Processes medical research questions through the pipeline
 """
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from pathlib import Path
 import logging
-import os
 
 from src.pipeline import run_pipeline
 from src.response_assembly import assemble_display_blocks
@@ -38,6 +37,8 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 
 # Create templates directory if it doesn't exist
 TEMPLATES_DIR.mkdir(exist_ok=True)
+
+PUBLIC_DIR = BASE_DIR / "public"
 
 # Setup Jinja2 templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
@@ -82,6 +83,29 @@ async def privacy(request: Request):
     return templates.TemplateResponse("privacy.html", {
         "request": request
     })
+
+
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+    """
+    Serve the About & FAQ page. Explains the product's intention (no diagnosis,
+    better prompts, research-only) and answers common questions.
+    """
+    return templates.TemplateResponse("about.html", {
+        "request": request
+    })
+
+
+@app.get("/main.js", include_in_schema=False)
+async def serve_main_js():
+    """Serve main JS bundle. Same URL locally and on Vercel (CDN may serve in prod)."""
+    return FileResponse(PUBLIC_DIR / "main.js", media_type="application/javascript")
+
+
+@app.get("/styles.css", include_in_schema=False)
+async def serve_styles():
+    """Serve styles. Same URL locally and on Vercel (CDN may serve in prod)."""
+    return FileResponse(PUBLIC_DIR / "styles.css", media_type="text/css")
 
 
 @app.post("/api/check", response_model=APIResponse)
@@ -192,14 +216,6 @@ async def api_info():
             "call_3": "Clarification Generator (if needed)"
         }
     }
-
-
-# Local dev: mount public/ at root so /styles.css and /main.js resolve correctly.
-# Must be added AFTER all routes so explicit routes take priority over the mount.
-# On Vercel (VERCEL=1), skipped entirely — CDN serves public/ automatically.
-if not os.getenv("VERCEL"):
-    from fastapi.staticfiles import StaticFiles
-    app.mount("/", StaticFiles(directory=BASE_DIR / "public"), name="public")
 
 
 if __name__ == "__main__":

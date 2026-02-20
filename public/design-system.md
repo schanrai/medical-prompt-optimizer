@@ -12,7 +12,7 @@ This document is the single source of truth for the visual design system used ac
 
 ## Color Tokens
 
-The full token config lives in the `tailwind.config` block at the top of each HTML template. Changes must be applied to **both** `index.html` and `privacy.html` until a shared config file is introduced.
+The full token config lives in the `tailwind.config` block at the top of each HTML template. Changes must be applied to **all** of `index.html`, `privacy.html`, and `about.html` until a shared config file is introduced.
 
 ### Warm Neutrals (base palette)
 
@@ -143,4 +143,4 @@ Result blocks are rendered dynamically by `main.js` after a `POST /api/check` re
 
 ## Known Maintenance Risk
 
-The Tailwind config block is **duplicated** in `index.html` and `privacy.html`. If you change a token value, update both files. A future improvement would be to extract this into a shared `static/tailwind.config.js` and reference it from both templates.
+The Tailwind config block is **duplicated** in `index.html`, `privacy.html`, and `about.html`. If you change a token value, update all three. A future improvement would be to extract this into a shared `static/tailwind.config.js` and reference it from all templates.
