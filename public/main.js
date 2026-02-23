@@ -216,23 +216,62 @@ function createMainContent(content, subtype) {
             <p class="text-xs font-medium text-warm-700 uppercase tracking-widest mb-3">Suggested rewrites — click to use</p>
             <div class="space-y-2">
                 ${content.clarification_options.map((option, index) => `
-                    <button
-                        class="clarification-option w-full text-left px-4 py-3 bg-white hover:bg-warm-50 border border-warm-100 rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-warm-900 flex items-start gap-3"
+                    <div
+                        class="clarification-option group relative w-full text-left px-4 py-3 bg-white hover:bg-warm-50 border border-warm-100 rounded-xl transition-colors duration-150 cursor-pointer flex items-start gap-3"
                         data-rewrite="${escapeHtml(option.rewritten_question)}"
+                        role="button"
+                        tabindex="0"
                     >
                         <span class="flex-shrink-0 w-7 h-7 rounded-full bg-warm-100 flex items-center justify-center text-xs font-semibold text-warm-700 mt-0.5">${index + 1}</span>
-                        <div class="flex-1 min-w-0">
+                        <div class="flex-1 min-w-0 pr-8">
                             <div class="text-sm font-semibold text-warm-900 mb-0.5">${escapeHtml(option.label)}</div>
                             <div class="text-sm text-warm-600">${escapeHtml(option.rewritten_question)}</div>
                         </div>
-                    </button>
+                        <button
+                            class="copy-btn absolute top-3 right-3 p-1.5 rounded-lg text-warm-400 hover:text-warm-700 hover:bg-warm-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-warm-900"
+                            data-copy="${escapeHtml(option.rewritten_question)}"
+                            title="Copy to clipboard"
+                            aria-label="Copy to clipboard"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                    </div>
                 `).join('')}
             </div>
         `;
 
-        div.querySelectorAll('.clarification-option').forEach(btn => {
-            btn.addEventListener('click', () => {
-                populateInputWithRewrite(btn.getAttribute('data-rewrite'));
+        div.querySelectorAll('.clarification-option').forEach(optionDiv => {
+            optionDiv.addEventListener('click', (e) => {
+                if (e.target.closest('.copy-btn')) return;
+                populateInputWithRewrite(optionDiv.getAttribute('data-rewrite'));
+            });
+            optionDiv.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    populateInputWithRewrite(optionDiv.getAttribute('data-rewrite'));
+                }
+            });
+        });
+
+        div.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const text = btn.getAttribute('data-copy');
+                try {
+                    await navigator.clipboard.writeText(text);
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                    btn.classList.add('text-green-600');
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.classList.remove('text-green-600');
+                    }, 1500);
+                } catch (err) {
+                    console.error('Failed to copy to clipboard:', err);
+                }
             });
         });
 
