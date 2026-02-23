@@ -123,9 +123,15 @@ async def serve_favicon():
 
 
 @app.get("/og-image.svg", include_in_schema=False)
-async def serve_og_image():
-    """Serve Open Graph image for social sharing (WhatsApp, LinkedIn, etc.)."""
+async def serve_og_image_svg():
+    """Serve Open Graph image (SVG). Kept for reference; social crawlers use PNG."""
     return FileResponse(PUBLIC_DIR / "og-image.svg", media_type="image/svg+xml")
+
+
+@app.get("/og-image.jpg", include_in_schema=False)
+async def serve_og_image():
+    """Serve Open Graph image (JPG) for social sharing (WhatsApp, LinkedIn, etc.)."""
+    return FileResponse(PUBLIC_DIR / "og-image.jpg", media_type="image/jpeg")
 
 
 @app.post("/api/check", response_model=APIResponse)
