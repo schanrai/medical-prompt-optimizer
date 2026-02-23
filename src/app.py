@@ -61,6 +61,11 @@ class APIResponse(BaseModel):
     error: str = None
 
 
+def _base_url(request: Request) -> str:
+    """Canonical base URL for OG tags and absolute links (no trailing slash)."""
+    return str(request.base_url).rstrip("/")
+
+
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     """
@@ -70,6 +75,7 @@ async def root(request: Request):
     """
     return templates.TemplateResponse("index.html", {
         "request": request,
+        "base_url": _base_url(request),
         "privacy_notice": PRIVACY_NOTICE,
         "page_disclaimer": PAGE_DISCLAIMER
     })
@@ -81,7 +87,8 @@ async def privacy(request: Request):
     Serve the privacy policy page.
     """
     return templates.TemplateResponse("privacy.html", {
-        "request": request
+        "request": request,
+        "base_url": _base_url(request)
     })
 
 
@@ -92,7 +99,8 @@ async def about(request: Request):
     better prompts, research-only) and answers common questions.
     """
     return templates.TemplateResponse("about.html", {
-        "request": request
+        "request": request,
+        "base_url": _base_url(request)
     })
 
 
@@ -106,6 +114,18 @@ async def serve_main_js():
 async def serve_styles():
     """Serve styles. Same URL locally and on Vercel (CDN may serve in prod)."""
     return FileResponse(PUBLIC_DIR / "styles.css", media_type="text/css")
+
+
+@app.get("/favicon.svg", include_in_schema=False)
+async def serve_favicon():
+    """Serve favicon for browser tabs and bookmarks."""
+    return FileResponse(PUBLIC_DIR / "favicon.svg", media_type="image/svg+xml")
+
+
+@app.get("/og-image.svg", include_in_schema=False)
+async def serve_og_image():
+    """Serve Open Graph image for social sharing (WhatsApp, LinkedIn, etc.)."""
+    return FileResponse(PUBLIC_DIR / "og-image.svg", media_type="image/svg+xml")
 
 
 @app.post("/api/check", response_model=APIResponse)

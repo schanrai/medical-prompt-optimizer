@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#F9F8F6"/>
+  <rect x="1" y="1" width="1198" height="628" rx="12" stroke="#D9CFC7" stroke-width="2" fill="none"/>
+  <text x="600" y="280" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="700" fill="#2C2420" text-anchor="middle">Medical Question Framing Tool</text>
+  <text x="600" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#6B5C54" text-anchor="middle">Turn vague medical questions into clearer research prompts</text>
+</svg>
